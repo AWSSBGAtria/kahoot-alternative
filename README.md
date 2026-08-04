@@ -1,62 +1,71 @@
+# SBG Quiz
 
-# Open source Kahoot alternative
+Open-source Kahoot alternative for classrooms. Real-time quiz competitions with live leaderboards, animated podiums, and mobile-first player experience.
 
-This is an open source Kahoot alternative , a game-based learning platform that brings engagement and fun at school, work, and at home.
-This project aims to provide similar functionality to Kahoot while being customizable and extensible for various educational and entertainment purposes.
+## Preview
 
-
-1. The host starts the game
-1. Players join the game
-1. The host starts the questions
-1. Players answer the questions
-1. Results are shown
-
-
-##  Built With
-* [Nextjs](https://nextjs.org/)
-* [Supabase](https://supabase.com/)
-* [Tailwind CSS](https://tailwindcss.com/)
+<table>
+  <tr>
+    <td><img src="public/preview-login.png" width="600" alt="Login"></td>
+    <td><img src="public/preview-dashboard.png" width="600" alt="Dashboard"></td>
+  </tr>
+  <tr>
+    <td><img src="public/preview-quizzes.png" width="600" alt="Quizzes"></td>
+  </tr>
+</table>
 
 
-## Run Locally
-```sh
-# Install dependencies 
+## Features
 
+- **Host Dashboard** — Create quiz sets, launch game sessions, monitor participation
+- **Live Quiz** — 20-second timed questions with 4 colored answer choices
+- **Real-time Leaderboard** — Scores update between questions
+- **Animated Podium** — 1st/2nd/3rd place reveal with confetti
+- **Mobile Join** — Students join via QR code or 6-character room code
+- **DiceBear Avatars** — Unique emoji avatars for each player
+- **Game History** — Review past sessions with participant lists
+
+## Tech Stack
+
+- [Next.js 14](https://nextjs.org/) — App Router, React, TypeScript
+- [Tailwind CSS](https://tailwindcss.com/) — Utility-first styling
+- [Prisma](https://www.prisma.io/) — ORM
+- [PostgreSQL](https://www.postgresql.org/) — Database
+- [DiceBear](https://www.dicebear.com/) — Avatar generation
+
+## Getting Started
+
+```bash
+# Install dependencies
 npm install
 
-# Start Supabase
+# Set up database
+npx prisma db push
+npx prisma db seed
 
-supabase start
-
-# Start Next.js locally
-
+# Start dev server
 npm run dev
-
-# Access app in your web browser at `http://localhost:3000`. 
-
 ```
 
-Access the project root at / to join as a player.
+Open [http://localhost:3000](http://localhost:3000)
 
-Access /host to join as a host.
+| Route | Description |
+|-------|-------------|
+| `/` | Player join page |
+| `/game/join` | Join with room code |
+| `/host/login` | Host admin login |
+| `/host/dashboard` | Quiz management |
 
-## Generate Types
-
-`supabase gen types typescript --local --schema public > src/types/supabase.ts`
-
-[read more on generating types](https://supabase.com/docs/guides/api/rest/generating-types)
-
+**Default credentials:** `admin@quiz.com` / `admin123`
 
 ## Contributing
 
-We welcome contributions from the community! If you'd like to contribute, please follow these guidelines:
-
-1. Fork the repository.
-2. Create your feature branch (`git checkout -b feature/YourFeature`).
-3. Commit your changes (`git commit -am 'Add some feature'`).
-4. Push to the branch (`git push origin feature/YourFeature`).
-5. Create a new Pull Request.
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
 
 ## License
-This project is licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
 
+MIT © [AWS Cloud Club Atria](https://github.com/AWSSBGAtria)
