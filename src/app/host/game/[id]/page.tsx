@@ -1,15 +1,7 @@
 'use client'
 
-import {
-  Answer,
-  Choice,
-  Game,
-  Participant,
-  Question,
-  QuizSet,
-  supabase,
-} from '@/types/types'
-import { useEffect, useState } from 'react'
+import { Game, Participant, QuizSet } from '@/types/types'
+import { useEffect, useRef, useState } from 'react'
 import Lobby from './lobby'
 import Quiz from './quiz'
 import Results from './results'
@@ -25,125 +17,60 @@ export default function Home({
 }: {
   params: { id: string }
 }) {
-  const [currentScreen, setCurrentScreen] = useState<AdminScreens>(
-    AdminScreens.lobby
-  )
-
+  const [currentScreen, setCurrentScreen] = useState<AdminScreens>(AdminScreens.lobby)
   const [participants, setParticipants] = useState<Participant[]>([])
-
   const [quizSet, setQuizSet] = useState<QuizSet>()
+  const [currentQuestionSequence, setCurrentQuestionSequence] = useState(0)
+  const [game, setGame] = useState<Game>()
+  const pollRef = useRef<NodeJS.Timeout>()
 
   useEffect(() => {
-    const getQuestions = async () => {
-      const { data: gameData, error: gameError } = await supabase
-        .from('games')
-        .select()
-        .eq('id', gameId)
-        .single()
-      if (gameError) {
-        console.error(gameError.message)
-        alert('Error getting game data')
-        return
-      }
-      const { data, error } = await supabase
-        .from('quiz_sets')
-        .select(`*, questions(*, choices(*))`)
-        .eq('id', gameData.quiz_set_id)
-        .order('order', {
-          ascending: true,
-          referencedTable: 'questions',
-        })
-        .single()
-      if (error) {
-        console.error(error.message)
-        getQuestions()
-        return
-      }
-      setQuizSet(data)
+    const fetchGame = async () => {
+      try {
+        const res = await fetch(`/api/games/${gameId}`)
+        if (!res.ok) return
+        const data = await res.json()
+        setGame(data)
+        setQuizSet(data.quizSet)
+        setCurrentScreen(data.phase as AdminScreens)
+        setCurrentQuestionSequence(data.currentQuestionSequence)
+      } catch { /* retry */ }
     }
 
-    const setGameListner = async () => {
-      const { data } = await supabase
-        .from('participants')
-        .select()
-        .eq('game_id', gameId)
-        .order('created_at')
-      if (data) setParticipants(data)
-
-      supabase
-        .channel('game')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'participants',
-            filter: `game_id=eq.${gameId}`,
-          },
-          (payload) => {
-            setParticipants((currentParticipants) => {
-              return [...currentParticipants, payload.new as Participant]
-            })
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'games',
-            filter: `id=eq.${gameId}`,
-          },
-          (payload) => {
-            // start the quiz game
-            const game = payload.new as Game
-            setCurrentQuestionSequence(game.current_question_sequence)
-            setCurrentScreen(game.phase as AdminScreens)
-          }
-        )
-        .subscribe()
-
-      const { data: gameData, error: gameError } = await supabase
-        .from('games')
-        .select()
-        .eq('id', gameId)
-        .single()
-
-      if (gameError) {
-        alert(gameError.message)
-        console.error(gameError)
-        return
-      }
-
-      setCurrentQuestionSequence(gameData.current_question_sequence)
-      setCurrentScreen(gameData.phase as AdminScreens)
+    const fetchParticipants = async () => {
+      try {
+        const res = await fetch(`/api/games/${gameId}/participants`)
+        if (!res.ok) return
+        const data = await res.json()
+        setParticipants(data)
+      } catch { /* retry */ }
     }
 
-    getQuestions()
-    setGameListner()
+    fetchGame()
+    fetchParticipants()
+    pollRef.current = setInterval(() => { fetchGame(); fetchParticipants() }, 2000)
+    return () => { if (pollRef.current) clearInterval(pollRef.current) }
   }, [gameId])
 
-  const [currentQuestionSequence, setCurrentQuestionSequence] = useState(0)
-
   return (
-    <main className="bg-green-600 min-h-screen">
-      {currentScreen == AdminScreens.lobby && (
-        <Lobby participants={participants} gameId={gameId}></Lobby>
+    <main className="min-h-screen bg-paper-cream">
+      {currentScreen === AdminScreens.lobby && (
+        <Lobby
+          participants={participants}
+          gameId={gameId}
+          roomCode={game?.roomCode ?? ''}
+        />
       )}
-      {currentScreen == AdminScreens.quiz && (
+      {currentScreen === AdminScreens.quiz && quizSet?.questions[currentQuestionSequence] && (
         <Quiz
-          question={quizSet!.questions![currentQuestionSequence]}
-          questionCount={quizSet!.questions!.length}
+          question={quizSet.questions[currentQuestionSequence]}
+          questionCount={quizSet.questions.length}
           gameId={gameId}
           participants={participants}
-        ></Quiz>
+        />
       )}
-      {currentScreen == AdminScreens.result && (
-        <Results
-          participants={participants!}
-          quizSet={quizSet!}
-          gameId={gameId}
-        ></Results>
+      {currentScreen === AdminScreens.result && (
+        <Results participants={participants} quizSet={quizSet!} gameId={gameId} />
       )}
     </main>
   )

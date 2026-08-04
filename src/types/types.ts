@@ -1,25 +1,75 @@
-import { createClient } from '@supabase/supabase-js'
-import { Database } from './supabase'
-
-export const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
-export type Participant = Database['public']['Tables']['participants']['Row']
-
-export type Choice = Database['public']['Tables']['choices']['Row']
-
-export type Question = Database['public']['Tables']['questions']['Row'] & {
-  choices: Choice[]
+export interface Admin {
+  id: string
+  email: string
+  createdAt: string
 }
 
-export type QuizSet = Database['public']['Tables']['quiz_sets']['Row'] & {
+export interface QuizSet {
+  id: string
+  name: string
+  description: string | null
+  createdAt: string
   questions: Question[]
 }
 
-export type Answer = Database['public']['Tables']['answers']['Row']
+export interface Question {
+  id: string
+  body: string
+  imageUrl: string | null
+  order: number
+  quizSetId: string
+  createdAt: string
+  choices: Choice[]
+}
 
-export type Game = Database['public']['Tables']['games']['Row']
+export interface Choice {
+  id: string
+  body: string
+  isCorrect: boolean
+  questionId: string
+  createdAt: string
+}
 
-export type GameResult = Database['public']['Views']['game_results']['Row']
+export interface Game {
+  id: string
+  quizSetId: string
+  hostId: string
+  roomCode: string
+  phase: string
+  currentQuestionSequence: number
+  isAnswerRevealed: boolean
+  createdAt: string
+}
+
+export interface Participant {
+  id: string
+  nickname: string
+  gameId: string
+  createdAt: string
+}
+
+export interface Answer {
+  id: string
+  participantId: string
+  questionId: string
+  choiceId: string | null
+  score: number
+  createdAt: string
+}
+
+export interface GameResult {
+  rank: number
+  participantId: string
+  nickname: string
+  totalScore: number
+}
+
+export interface LeaderboardData {
+  currentQuestion: number
+  totalQuestions: number
+  totalAnswers: number
+  totalParticipants: number
+  answerCounts: Array<{ choiceId: string; count: number }>
+  phase: string
+  isAnswerRevealed: boolean
+}

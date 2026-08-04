@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  games Game[]
+
+  @@map("admins")
+}
+
+model QuizSet {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  questions Question[]
+  games     Game[]
+
+  @@map("quiz_sets")
+}
+
+model Question {
+  id        String   @id @default(uuid())
+  body      String
+  imageUrl  String?  @map("image_url")
+  order     Int
+  quizSetId String   @map("quiz_set_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  quizSet  QuizSet   @relation(fields: [quizSetId], references: [id], onDelete: Cascade)
+  choices  Choice[]
+  answers  Answer[]
+
+  @@unique([quizSetId, order])
+  @@map("questions")
+}
+
+model Choice {
+  id         String   @id @default(uuid())
+  body       String
+  isCorrect  Boolean  @default(false) @map("is_correct")
+  questionId String   @map("question_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers  Answer[]
+
+  @@map("choices")
+}
+
+model Game {
+  id                      String   @id @default(uuid())
+  quizSetId               String   @map("quiz_set_id")
+  hostId                  String   @map("host_id")
+  roomCode                String   @unique @map("room_code")
+  phase                   String   @default("lobby")
+  currentQuestionSequence Int      @default(0) @map("current_question_sequence")
+  isAnswerRevealed        Boolean  @default(false) @map("is_answer_revealed")
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  host         Admin         @relation(fields: [hostId], references: [id])
+  quizSet      QuizSet       @relation(fields: [quizSetId], references: [id])
+  participants Participant[]
+
+  @@map("games")
+}
+
+model Participant {
+  id        String   @id @default(uuid())
+  nickname  String
+  gameId    String   @map("game_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  game    Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@unique([gameId, nickname])
+  @@map("participants")
+}
+
+model Answer {
+  id            String   @id @default(uuid())
+  participantId String   @map("participant_id")
+  questionId    String   @map("question_id")
+  choiceId      String?  @map("choice_id")
+  score         Int
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  participant Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  question    Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  choice      Choice?     @relation(fields: [choiceId], references: [id], onDelete: SetNull)
+
+  @@unique([participantId, questionId])
+  @@map("answers")
+}
