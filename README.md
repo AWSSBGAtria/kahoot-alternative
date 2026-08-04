@@ -68,4 +68,4 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## License
 
-MIT © [AWS Cloud Club Atria](https://github.com/AWSSBGAtria)
+MIT © [AWS SBG Atria](https://github.com/AWSSBGAtria)
