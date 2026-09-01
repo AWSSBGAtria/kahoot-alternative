@@ -1,44 +1,21 @@
-import { SignJWT, jwtVerify } from 'jose'
-import bcrypt from 'bcryptjs'
 import { cookies } from 'next/headers'
+import { signToken, verifyToken, AdminPayload } from './jwt'
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'fallback-secret-change-me'
-)
+export * from './jwt'
 
 const COOKIE_NAME = 'admin_token'
 
-export interface AdminPayload {
-  adminId: string
-  email: string
-}
-
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12)
+  const bcrypt = await import('bcryptjs')
+  return (bcrypt.default?.hash || bcrypt.hash)(password, 12)
 }
 
 export async function verifyPassword(
   password: string,
   hash: string
 ): Promise<boolean> {
-  return bcrypt.compare(password, hash)
-}
-
-export async function signToken(payload: AdminPayload): Promise<string> {
-  return new SignJWT(payload as unknown as Record<string, unknown>)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('7d')
-    .sign(JWT_SECRET)
-}
-
-export async function verifyToken(token: string): Promise<AdminPayload | null> {
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET)
-    return payload as unknown as AdminPayload
-  } catch {
-    return null
-  }
+  const bcrypt = await import('bcryptjs')
+  return (bcrypt.default?.compare || bcrypt.compare)(password, hash)
 }
 
 export async function setAuthCookie(token: string) {
