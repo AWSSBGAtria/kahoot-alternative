@@ -166,7 +166,7 @@ export default function Quiz({
         {/* Question Banner — pinned card */}
         <div className="text-center max-w-4xl mx-auto w-full mt-4">
           <div className="card-pinned pin p-6 md:p-8">
-            <h2 className="font-display text-2xl md:text-4xl font-bold text-charcoal leading-tight">
+            <h2 className="font-body font-bold text-2xl md:text-4xl text-charcoal leading-snug tracking-tight">
               {question.body}
             </h2>
           </div>
@@ -260,13 +260,13 @@ export default function Quiz({
               return (
                 <div
                   key={choice.id}
-                  className={`p-4 md:p-5 rounded-card font-display font-bold text-lg md:text-xl text-white flex items-center justify-between shadow-card ${theme.bg} ${
+                  className={`p-4 md:p-5 rounded-card font-body font-bold text-lg md:text-xl text-white flex items-center justify-between shadow-card ${theme.bg} ${
                     isAnswerRevealed && !choice.isCorrect ? 'opacity-30' : ''
                   } ${isAnswerRevealed && choice.isCorrect ? `ring-4 ${theme.ring} shadow-card-hover` : ''}`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="opacity-80">{theme.icon}</span>
-                    <span>{choice.body}</span>
+                    <span className="opacity-80 font-display text-xl">{theme.icon}</span>
+                    <span className="font-body font-semibold">{choice.body}</span>
                   </div>
                   {isAnswerRevealed && choice.isCorrect && (
                     <span className="w-7 h-7 rounded-full bg-white text-charcoal flex items-center justify-center font-bold text-sm shadow-card">

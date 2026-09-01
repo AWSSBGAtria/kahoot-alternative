@@ -102,7 +102,7 @@ export default function Quiz({
       {/* Question Heading — pinned card */}
       <div className="relative z-10 text-center max-w-4xl mx-auto w-full my-3">
         <div className="card-pinned pin p-5 md:p-6 shadow-card">
-          <h2 className="font-display text-lg sm:text-xl md:text-3xl font-bold text-charcoal leading-tight">
+          <h2 className="font-body font-bold text-xl md:text-3xl text-charcoal leading-snug tracking-tight">
             {question.body}
           </h2>
         </div>
@@ -185,11 +185,11 @@ export default function Quiz({
                   type="button"
                   onClick={() => answer(choice)}
                   disabled={!canClick || submitting}
-                  className={`${theme.bg} min-w-0 aspect-square md:aspect-auto p-3 sm:p-4 md:p-8 rounded-card font-display font-bold text-sm sm:text-base md:text-2xl leading-tight text-white text-center md:text-left flex items-center justify-center md:justify-between overflow-hidden shadow-card transition hover:brightness-110 active:scale-[0.98] disabled:opacity-85 touch-manipulation cursor-pointer select-none`}
+                  className={`${theme.bg} min-w-0 aspect-square md:aspect-auto p-3 sm:p-4 md:p-8 rounded-card font-body font-bold text-sm sm:text-base md:text-2xl leading-snug text-white text-center md:text-left flex items-center justify-center md:justify-between overflow-hidden shadow-card transition hover:brightness-110 active:scale-[0.98] disabled:opacity-85 touch-manipulation cursor-pointer select-none`}
                 >
                   <span className="flex min-w-0 max-w-full flex-col items-center gap-2 md:flex-row md:items-center md:gap-3">
-                    <span className="shrink-0 opacity-80 text-2xl sm:text-3xl md:text-2xl">{theme.icon}</span>
-                    <span className="min-w-0 max-w-full break-words">{choice.body}</span>
+                    <span className="shrink-0 opacity-80 text-2xl sm:text-3xl md:text-2xl font-display">{theme.icon}</span>
+                    <span className="min-w-0 max-w-full break-words font-body font-semibold">{choice.body}</span>
                   </span>
                 </button>
               )
