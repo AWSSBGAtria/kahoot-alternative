@@ -8,8 +8,21 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  let dbAdmin = await db.admin.findUnique({
+    where: { id: admin.adminId },
+  })
+  if (!dbAdmin && admin.email) {
+    dbAdmin = await db.admin.findUnique({
+      where: { email: admin.email },
+    })
+  }
+
+  if (!dbAdmin) {
+    return NextResponse.json([], { status: 200 })
+  }
+
   const games = await db.game.findMany({
-    where: { hostId: admin.adminId },
+    where: { hostId: dbAdmin.id },
     include: {
       quizSet: true,
       participants: true,
