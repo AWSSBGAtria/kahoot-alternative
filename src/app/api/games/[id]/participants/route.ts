@@ -88,7 +88,16 @@ export async function DELETE(
     return NextResponse.json({ error: 'Game not found' }, { status: 404 })
   }
 
-  if (game.hostId !== admin.adminId) {
+  let dbAdmin = await db.admin.findUnique({
+    where: { id: admin.adminId },
+  })
+  if (!dbAdmin && admin.email) {
+    dbAdmin = await db.admin.findUnique({
+      where: { email: admin.email },
+    })
+  }
+
+  if (!dbAdmin || game.hostId !== dbAdmin.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
