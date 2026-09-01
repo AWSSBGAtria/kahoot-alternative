@@ -94,7 +94,7 @@ export default function Lobby({
               <div className="text-xs uppercase tracking-wider text-pencil font-semibold mb-0.5">
                 Join at
               </div>
-              <div className="text-lg md:text-2xl font-display font-bold text-paper-blue">
+              <div className="text-lg md:text-2xl font-mono font-bold text-paper-blue tracking-wide">
                 {baseUrl ? baseUrl.replace(/^https?:\/\//, '') : '...'}
               </div>
             </div>

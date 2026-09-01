@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getAdminFromCookie } from '@/lib/auth'
-import { nanoid } from 'nanoid'
+import { customAlphabet } from 'nanoid'
+
+const generateRoomCode = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6)
 
 export async function POST(request: Request) {
   const admin = await getAdminFromCookie()
@@ -22,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Quiz set not found' }, { status: 404 })
   }
 
-  const roomCode = nanoid(6).toUpperCase()
+  const roomCode = generateRoomCode()
 
   const game = await db.game.create({
     data: {
